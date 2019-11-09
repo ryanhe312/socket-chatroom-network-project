@@ -1,6 +1,8 @@
 import socket
 import threading
 import json
+import ssl
+import os
 
 
 class Server:
@@ -11,9 +13,11 @@ class Server:
         """
         构造
         """
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__connections = list()
         self.__nicknames = list()
+        self.__context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        self.__context.load_cert_chain(os.path.join(os.getcwd(), 'cert','server.crt'), os.path.join(os.getcwd(),'cert','server_rsa_private.pem'))
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __user_thread(self, user_id):
         """
@@ -50,6 +54,7 @@ class Server:
         :param user_id: 用户id(0为系统)
         :param message: 广播内容
         """
+
         for i in range(1, len(self.__connections)):
             if user_id != i and self.__connections[i]:
                 self.__connections[i].send(json.dumps({
@@ -66,6 +71,9 @@ class Server:
         self.__socket.bind(('127.0.0.1', 8888))
         # 启用监听
         self.__socket.listen(10)
+        # SSL打包
+        self.__ssocket = self.__context.wrap_socket(self.__socket, server_side=True)
+
         print('[Server] 服务器正在运行......')
 
         # 清空连接
@@ -76,7 +84,7 @@ class Server:
 
         # 开始侦听
         while True:
-            connection, address = self.__socket.accept()
+            connection, address = self.__ssocket.accept()
             print('[Server] 收到一个新连接', connection.getsockname(), connection.fileno())
 
             # 尝试接受数据
