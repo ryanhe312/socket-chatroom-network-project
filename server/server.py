@@ -13,11 +13,15 @@ class Server:
         """
         构造
         """
+        # 线程槽
         self.__connections = list()
+        
+        # 名字槽
         self.__nicknames = list()
-        self.__context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+
+        # SSL 打包上下文
+        self.__context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         self.__context.load_cert_chain(os.path.join(os.getcwd(), 'cert','server.crt'), os.path.join(os.getcwd(),'cert','server_rsa_private.pem'))
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __user_thread(self, user_id):
         """
@@ -67,12 +71,18 @@ class Server:
         """
         启动服务器
         """
+
+        # 新建连接
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # 绑定端口
         self.__socket.bind(('127.0.0.1', 8888))
         # 启用监听
         self.__socket.listen(10)
+
         # SSL打包
         self.__ssocket = self.__context.wrap_socket(self.__socket, server_side=True)
+        # 非SSL打包
+        #self.__ssocket = self.__socket
 
         print('[Server] 服务器正在运行......')
 

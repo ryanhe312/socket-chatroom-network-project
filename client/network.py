@@ -23,8 +23,12 @@ class Client_Network(QObject):
         super().__init__()
         self.__id = None
         self.__nickname = None   
+
+        # 连接指示
         self.__conn_flag = False
-        self.__context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+        # SSL打包上下文
+        self.__context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
         self.__context.load_verify_locations(os.path.join(os.getcwd(), 'ca','ca.crt'))
 
     def __receive_message_thread(self):
@@ -44,6 +48,9 @@ class Client_Network(QObject):
                 self.stat.emit('[Error] 无法从服务器获取数据')
                 self.__conn_flag = False
                 return
+
+            # 定期刷新
+            time.sleep(1)
             
 
     def __send_message_thread(self, message):
@@ -71,7 +78,7 @@ class Client_Network(QObject):
 
         # 尝试连接服务器
         try:
-            self.__socket.connect(('127.0.0.1', 8888))
+            self.__socket.connect(('122.51.39.201', 9999))
         except Exception:
             self.stat.emit('[Error] 无法连接到服务器, 请重新连接')
             self.__socket.close()
@@ -79,6 +86,8 @@ class Client_Network(QObject):
 
         # SSL打包
         self.__ssocket = self.__context.wrap_socket(self.__socket, server_hostname='SERVER')
+        # 非SSL打包
+        #self.__ssocket = self.__socket
 
         # 将昵称发送给服务器，获取用户id
         self.__ssocket.send(json.dumps({
