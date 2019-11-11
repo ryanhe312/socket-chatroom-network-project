@@ -29,7 +29,7 @@ class Client_Network(QObject):
 
         # SSL打包上下文
         self.__context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        self.__context.load_verify_locations(os.path.join(os.getcwd(), 'ca','ca.crt'))
+        self.__context.load_verify_locations(os.path.join('ca','ca.crt'))
 
     def __receive_message_thread(self):
         """
