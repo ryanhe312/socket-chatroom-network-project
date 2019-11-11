@@ -21,7 +21,7 @@ class Server:
 
         # SSL 打包上下文
         self.__context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        self.__context.load_cert_chain(os.path.join('cert','server.crt'), os.path.join('cert','server_rsa_private.pem'))
+        self.__context.load_cert_chain(os.path.join('server.crt'), os.path.join('server.key'))
 
     def __user_thread(self, user_id):
         """

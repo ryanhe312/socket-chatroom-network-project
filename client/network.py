@@ -29,7 +29,7 @@ class Client_Network(QObject):
 
         # SSL打包上下文
         self.__context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        self.__context.load_verify_locations(os.path.join('ca','ca.crt'))
+        self.__context.load_verify_locations(os.path.join('server.crt'))
 
     def __receive_message_thread(self):
         """
@@ -78,7 +78,7 @@ class Client_Network(QObject):
 
         # 尝试连接服务器
         try:
-            self.__socket.connect(('122.51.39.201', 9999))
+            self.__socket.connect(('127.0.0.1', 8888))
         except Exception:
             self.stat.emit('[Error] 无法连接到服务器, 请重新连接')
             self.__socket.close()
