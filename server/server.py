@@ -47,6 +47,7 @@ class Server:
                     print('[Server] 无法解析json数据包:', connection.getsockname(), connection.fileno())
             except Exception:
                 print('[Server] 连接失效:', connection.getsockname(), connection.fileno())
+                self.__broadcast(message='用户 ' + str(nickname) + '(' + str(user_id) + ')' + '退出聊天室')
                 self.__connections[user_id].close()
                 self.__connections[user_id] = None
                 self.__nicknames[user_id] = None
