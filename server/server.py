@@ -3,7 +3,7 @@ import threading
 import json
 import ssl
 import os
-
+import time
 
 class Server:
     """
@@ -26,7 +26,6 @@ class Server:
     def __user_thread(self, user_id):
         """
         用户子线程
-        :param user_id: 用户id
         """
         connection = self.__connections[user_id]
         nickname = self.__nicknames[user_id]
@@ -35,7 +34,6 @@ class Server:
 
         # 侦听
         while True:
-            # noinspection PyBroadException
             try:
                 buffer = connection.recv(1024).decode()
                 # 解析成json数据
@@ -53,11 +51,12 @@ class Server:
                 self.__nicknames[user_id] = None
                 return
 
+            # 定期刷新
+            time.sleep(0.1)
+
     def __broadcast(self, user_id=0, message=''):
         """
         广播
-        :param user_id: 用户id(0为系统)
-        :param message: 广播内容
         """
 
         for i in range(1, len(self.__connections)):
@@ -95,11 +94,10 @@ class Server:
 
         # 开始侦听
         while True:
-            connection, address = self.__ssocket.accept()
+            connection, _ = self.__ssocket.accept()
             print('[Server] 收到一个新连接', connection.getsockname(), connection.fileno())
 
             # 尝试接受数据
-            # noinspection PyBroadException
             try:
                 buffer = connection.recv(1024).decode()
                 # 解析成json数据
